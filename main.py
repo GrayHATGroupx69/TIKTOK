@@ -3,7 +3,7 @@ import random
 import string
 import time
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1399569154218135653/Xi_Bs7y3hKxA3TFD1iLo8eP8coiAy74Cle6rJLEqlf05LkvWCoCWiXfOo8qYXkufYMPm"
+WEBHOOK_URL = "https://discord.com/api/webhooks/1399789560589717504/dh2Nr8LdgjRcXVsfSKf7oIoY-UoKUX2P_BY4uJcoLmKrcnROuu7xg-WqWCXSONUYnU-m"
 
 def generate_tiktok_username():
     patterns = [
@@ -17,13 +17,7 @@ def generate_tiktok_username():
     return random.choice(patterns)()
 
 def generate_discord_code():
-    patterns = [
-        lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=2)),
-        lambda: ''.join(random.choices(string.ascii_letters + string.digits + "_-", k=3)),
-        lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=3)),
-        lambda: ''.join(random.choices(string.ascii_letters + string.digits + "_-", k=4)),
-    ]
-    return random.choice(patterns)()
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=2))
 
 def check_tiktok_user_available(username):
     url = f"https://www.tiktok.com/@{username}"
