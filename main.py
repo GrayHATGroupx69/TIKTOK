@@ -3,37 +3,68 @@ import string
 import requests
 import time
 
+
 WEBHOOK_URL = "https://discord.com/api/webhooks/1399789560589717504/dh2Nr8LdgjRcXVsfSKf7oIoY-UoKUX2P_BY4uJcoLmKrcnROuu7xg-WqWCXSONUYnU-m"
 
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
 
-def generate_username(length):
-    characters = string.ascii_lowercase + string.digits + "._"
-    return ''.join(random.choices(characters, k=length))
+def generate_usernames(count=50):
+    usernames = set()
 
-def is_username_available(username):
-    url = f"https://www.instagram.com/{username}/"
-    response = requests.get(url, headers=headers)
-    return response.status_code == 404
+    while len(usernames) < count:
+        choice = random.choice(["tri", "semi_tri", "semi_quad"])
+        if choice == "tri":
+            name = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
+        elif choice == "semi_tri":
+            pattern = random.choice([
+                f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}",
+                f"{random.choice(string.ascii_lowercase)}{random.choice(string.digits)}{random.choice(string.ascii_lowercase)}"
+            ])
+            name = pattern
+        else:  
+            name = ''.join(random.choices(string.ascii_lowercase + string.digits + "_", k=4))
 
-def send_to_discord(username):
+        usernames.add(name)
+    
+    return list(usernames)
+
+
+def check_username_available(username):
+    url = f"https://discord.com/users/{username}"
+    response = requests.get(url)
+    if response.status_code == 404:
+        return True  
+    elif response.status_code == 200:
+        return False  
+    else:
+        return None   
+
+
+def send_to_webhook(username):
     data = {
-        "content": f"@everyone\n**NEW INSTAGRAM USER !!**\n**USER:** `{username}`\n**THIS TOOL BY GRAYHATX69**"
+        "content": f"@everyone\n**new discord user available**\n`{username}`"
     }
-    requests.post(WEBHOOK_URL, json=data)
-
-def main():
-    while True:
-        length = random.choice([3, 4, 5])
-        username = generate_username(length)
-        if is_username_available(username):
-            print(f"[✅ AVAILABLE] {username}")
-            send_to_discord(username)
+    try:
+        response = requests.post(WEBHOOK_URL, json=data)
+        if response.status_code == 204 or response.status_code == 200:
+            print(f"[Webhook] أُرسل بنجاح: {username}")
         else:
-            print(f"[❌ TAKEN] {username}")
-        time.sleep(2) 
+            print(f"[Webhook] فشل الإرسال: {response.status_code}")
+    except Exception as e:
+        print(f"[Webhook] خطأ أثناء الإرسال: {e}")
+
 
 if __name__ == "__main__":
-    main()
+    generated = generate_usernames(30)
+    print("🔍 جاري التحقق من اليوزرات...\n")
+
+    for user in generated:
+        available = check_username_available(user)
+        if available is True:
+            print(f"[✓] {user} يبدو أنه متاح")
+            send_to_webhook(user)
+        elif available is False:
+            print(f"[×] {user} مستخدم بالفعل")
+        else:
+            print(f"[?] {user} لا يمكن التحقق (غير معروف)")
+
+        time.sleep(1)  
