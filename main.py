@@ -3,40 +3,33 @@ import string
 import requests
 import time
 
-# Your Discord webhook
+# New webhook URL
 WEBHOOK_URL = "https://discord.com/api/webhooks/1399789562745589770/n0hRBZwhZ_xeY-m9qDXJQNv4StWhueBhncbltPNj-r__z3XgKOyaf0wDEQ1WflXDHxWV"
 
-# Generate a single username
+# Generate only semi-quad and quad usernames
 def generate_username():
-    pattern_type = random.choice(["tri", "semi_tri", "semi_quad"])
+    pattern_type = random.choice(["semi_quad", "quad"])
 
-    if pattern_type == "tri":
-        return ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
-
-    elif pattern_type == "semi_tri":
-        return random.choice([
-            f"{random.choice(string.ascii_lowercase)}_{random.choice(string.ascii_lowercase)}",
-            f"{random.choice(string.ascii_lowercase)}{random.choice(string.digits)}{random.choice(string.ascii_lowercase)}"
-        ])
-
-    else:  # semi_quad
+    if pattern_type == "semi_quad":
         return ''.join(random.choices(string.ascii_lowercase + string.digits + "_", k=4))
+    else:  # quad
+        return ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
 
-# Check if a username is likely available (simulated)
+# Check if username exists (rough simulation)
 def check_username_available(username):
     url = f"https://discord.com/users/{username}"
     try:
         response = requests.get(url)
         if response.status_code == 404:
-            return True
+            return True   # Probably available
         elif response.status_code == 200:
-            return False
+            return False  # Taken
         else:
-            return None
+            return None   # Unknown
     except:
         return None
 
-# Send webhook with status
+# Send result to webhook
 def send_to_webhook(username, available):
     if available is True:
         content = f"@everyone\n**new discord user available**\n`{username}`"
@@ -54,9 +47,9 @@ def send_to_webhook(username, available):
     except Exception as e:
         print(f"[Webhook] Error: {e}")
 
-# Infinite loop to keep guessing usernames
+# Main loop
 if __name__ == "__main__":
-    print("🚀 Username checker started (infinite loop)...\n")
+    print("🚀 Starting semi-quad & quad Discord username checker...\n")
 
     while True:
         username = generate_username()
@@ -71,4 +64,4 @@ if __name__ == "__main__":
 
         send_to_webhook(username, status)
 
-        time.sleep(1)  # avoid rate limiting
+        time.sleep(1)  # delay to avoid Discord rate limit
