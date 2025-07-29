@@ -3,33 +3,33 @@ import string
 import requests
 import time
 
-# New webhook URL
+# Your updated Discord Webhook
 WEBHOOK_URL = "https://discord.com/api/webhooks/1399789562745589770/n0hRBZwhZ_xeY-m9qDXJQNv4StWhueBhncbltPNj-r__z3XgKOyaf0wDEQ1WflXDHxWV"
 
-# Generate only semi-quad and quad usernames
+# Generate semi-quad or quad username (4 chars only)
 def generate_username():
     pattern_type = random.choice(["semi_quad", "quad"])
-
+    
     if pattern_type == "semi_quad":
         return ''.join(random.choices(string.ascii_lowercase + string.digits + "_", k=4))
     else:  # quad
         return ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
 
-# Check if username exists (rough simulation)
+# Check if the username is available (not guaranteed, just simulated)
 def check_username_available(username):
     url = f"https://discord.com/users/{username}"
     try:
         response = requests.get(url)
         if response.status_code == 404:
-            return True   # Probably available
+            return True   # Likely available
         elif response.status_code == 200:
             return False  # Taken
         else:
-            return None   # Unknown
+            return None   # Unclear
     except:
         return None
 
-# Send result to webhook
+# Send result to Discord Webhook
 def send_to_webhook(username, available):
     if available is True:
         content = f"@everyone\n**new discord user available**\n`{username}`"
@@ -47,9 +47,9 @@ def send_to_webhook(username, available):
     except Exception as e:
         print(f"[Webhook] Error: {e}")
 
-# Main loop
+# Main infinite loop
 if __name__ == "__main__":
-    print("🚀 Starting semi-quad & quad Discord username checker...\n")
+    print("🔁 Starting infinite Discord username checker (semi-quad & quad)...\n")
 
     while True:
         username = generate_username()
@@ -63,5 +63,4 @@ if __name__ == "__main__":
             print(f"[?] Could not verify {username}")
 
         send_to_webhook(username, status)
-
-        time.sleep(1)  # delay to avoid Discord rate limit
+        time.sleep(1)  # Avoid rate limiting
